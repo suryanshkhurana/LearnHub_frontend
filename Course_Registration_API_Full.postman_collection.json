@@ -1,0 +1,860 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Course Registration API – Full Collection",
+		"description": "End-to-end Postman collection for Course Registration Backend with Razorpay payment integration.\n\n**Setup:**\n1. Set `baseUrl` variable (default: http://localhost:8081/api/v1)\n2. Register a user, then login – tokens are auto-saved.\n3. Use the collection in order for best results.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081/api/v1"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "refreshToken",
+			"value": ""
+		},
+		{
+			"key": "courseId",
+			"value": ""
+		},
+		{
+			"key": "lectureId",
+			"value": ""
+		},
+		{
+			"key": "razorpayOrderId",
+			"value": ""
+		},
+		{
+			"key": "razorpayPaymentId",
+			"value": ""
+		},
+		{
+			"key": "razorpaySignature",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "1. Auth",
+			"item": [
+				{
+					"name": "Register – Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.user && res.user._id) {",
+									"    pm.collectionVariables.set('userId', res.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Student\",\n    \"email\": \"student@test.com\",\n    \"password\": \"password123\",\n    \"role\": \"student\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Register – Instructor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Instructor\",\n    \"email\": \"instructor@test.com\",\n    \"password\": \"password123\",\n    \"role\": \"instructor\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login – Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', res.accessToken);",
+									"}",
+									"if (res.refreshToken) {",
+									"    pm.collectionVariables.set('refreshToken', res.refreshToken);",
+									"}",
+									"if (res.user && res.user._id) {",
+									"    pm.collectionVariables.set('userId', res.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"student@test.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login – Instructor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', res.accessToken);",
+									"}",
+									"if (res.refreshToken) {",
+									"    pm.collectionVariables.set('refreshToken', res.refreshToken);",
+									"}",
+									"if (res.user && res.user._id) {",
+									"    pm.collectionVariables.set('userId', res.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"instructor@test.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/current-user",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "current-user"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', res.accessToken);",
+									"}",
+									"if (res.refreshToken) {",
+									"    pm.collectionVariables.set('refreshToken', res.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh-token"]
+						}
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"password123\",\n    \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "change-password"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"email\": \"student@test.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/update-profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "update-profile"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('accessToken', '');",
+									"pm.collectionVariables.set('refreshToken', '');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Auth – Enrollment (via /auth)",
+			"item": [
+				{
+					"name": "Get Enrolled Courses (auth route)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/enrolled-courses",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "enrolled-courses"]
+						}
+					}
+				},
+				{
+					"name": "Enroll in Course (auth route)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/enroll/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "enroll", "{{courseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Unenroll from Course (auth route)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/unenroll/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "unenroll", "{{courseId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Courses – Instructor",
+			"item": [
+				{
+					"name": "Create Course (Free)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.course && res.course._id) {",
+									"    pm.collectionVariables.set('courseId', res.course._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Introduction to Node.js\",\n    \"description\": \"Learn Node.js from scratch\",\n    \"category\": \"Backend\",\n    \"schedule\": {\n        \"day\": \"Monday\",\n        \"startTime\": \"10:00\",\n        \"endTime\": \"12:00\"\n    },\n    \"maxStudents\": 50,\n    \"price\": 0,\n    \"isPaid\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses"]
+						}
+					}
+				},
+				{
+					"name": "Create Course (Paid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.course && res.course._id) {",
+									"    pm.collectionVariables.set('courseId', res.course._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Advanced React with TypeScript\",\n    \"description\": \"Master React and TypeScript together\",\n    \"category\": \"Frontend\",\n    \"schedule\": {\n        \"day\": \"Wednesday\",\n        \"startTime\": \"14:00\",\n        \"endTime\": \"16:00\"\n    },\n    \"maxStudents\": 30,\n    \"price\": 499,\n    \"isPaid\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses"]
+						}
+					}
+				},
+				{
+					"name": "Update Course",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Advanced React with TypeScript – Updated\",\n    \"status\": \"published\",\n    \"price\": 599,\n    \"isPaid\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Upload Course Thumbnail",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/thumbnail",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "thumbnail"]
+						}
+					}
+				},
+				{
+					"name": "Get My Courses (Instructor)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/instructor/my-courses",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "instructor", "my-courses"]
+						}
+					}
+				},
+				{
+					"name": "Delete Course",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Courses – Public / Student",
+			"item": [
+				{
+					"name": "Get All Published Courses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/courses/published?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "published"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "category", "value": "Frontend", "disabled": true },
+								{ "key": "search", "value": "react", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Course By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Enroll in Free Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/enroll",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "enroll"]
+						},
+						"description": "Only works for FREE courses (isPaid=false). For paid courses, use the Razorpay payment flow."
+					}
+				},
+				{
+					"name": "Get Enrolled Courses (course route)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/student/enrolled",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "student", "enrolled"]
+						}
+					}
+				},
+				{
+					"name": "Withdraw from Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/withdraw",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "withdraw"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Payments – Razorpay",
+			"description": "Full payment flow:\n1. Get Razorpay Key\n2. Create Order for a paid course\n3. Complete payment on Razorpay checkout (client-side)\n4. Verify Payment → auto-enrolls the student\n5. View payment history",
+			"item": [
+				{
+					"name": "Get Razorpay Key",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/key",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "key"]
+						}
+					},
+					"description": "Returns the Razorpay key_id needed by the client-side checkout."
+				},
+				{
+					"name": "Create Order (Paid Course)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.order && res.order.id) {",
+									"    pm.collectionVariables.set('razorpayOrderId', res.order.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payments/order/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "order", "{{courseId}}"]
+						}
+					},
+					"description": "Creates a Razorpay order. The `order.id`, `order.amount`, and `key` from the response are passed to Razorpay checkout on the frontend."
+				},
+				{
+					"name": "Verify Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"razorpay_order_id\": \"{{razorpayOrderId}}\",\n    \"razorpay_payment_id\": \"{{razorpayPaymentId}}\",\n    \"razorpay_signature\": \"{{razorpaySignature}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "verify"]
+						}
+					},
+					"description": "Send the razorpay_order_id, razorpay_payment_id, and razorpay_signature received from the Razorpay checkout callback. On success, the student is automatically enrolled in the course."
+				},
+				{
+					"name": "Get My Payments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/payments/my-payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "my-payments"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Lectures",
+			"item": [
+				{
+					"name": "Create Lecture (Instructor)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.lecture && res.lecture._id) {",
+									"    pm.collectionVariables.set('lectureId', res.lecture._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "title", "value": "Lecture 1 – Getting Started", "type": "text" },
+								{ "key": "description", "value": "Introduction and setup", "type": "text" },
+								{ "key": "order", "value": "1", "type": "text" },
+								{ "key": "isPreview", "value": "false", "type": "text" },
+								{ "key": "video", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures"]
+						}
+					}
+				},
+				{
+					"name": "Get All Lectures for Course",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures"]
+						}
+					}
+				},
+				{
+					"name": "Get Lecture By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures", "{{lectureId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Lecture (Instructor)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Lecture 1 – Updated Title\",\n    \"description\": \"Updated description\",\n    \"isPreview\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures", "{{lectureId}}"]
+						}
+					}
+				},
+				{
+					"name": "Reorder Lectures (Instructor)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lectureOrders\": [\n        { \"lectureId\": \"{{lectureId}}\", \"order\": 2 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures/reorder",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures", "reorder"]
+						}
+					}
+				},
+				{
+					"name": "Delete Lecture (Instructor)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/courses/{{courseId}}/lectures/{{lectureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["courses", "{{courseId}}", "lectures", "{{lectureId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Progress",
+			"item": [
+				{
+					"name": "Get All Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/progress",
+							"host": ["{{baseUrl}}"],
+							"path": ["progress"]
+						}
+					}
+				},
+				{
+					"name": "Get Course Progress",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/progress/{{courseId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["progress", "{{courseId}}"]
+						}
+					}
+				},
+				{
+					"name": "Mark Lecture Completed",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/progress/{{courseId}}/lectures/{{lectureId}}/complete",
+							"host": ["{{baseUrl}}"],
+							"path": ["progress", "{{courseId}}", "lectures", "{{lectureId}}", "complete"]
+						}
+					}
+				},
+				{
+					"name": "Mark Lecture Incomplete",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/progress/{{courseId}}/lectures/{{lectureId}}/incomplete",
+							"host": ["{{baseUrl}}"],
+							"path": ["progress", "{{courseId}}", "lectures", "{{lectureId}}", "incomplete"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Dashboard",
+			"item": [
+				{
+					"name": "Student Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/student",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "student"]
+						}
+					}
+				},
+				{
+					"name": "Instructor Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{accessToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/instructor",
+							"host": ["{{baseUrl}}"],
+							"path": ["dashboard", "instructor"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
